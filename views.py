@@ -114,8 +114,6 @@ def login():
     coin_name = data.get("coin_name")
     IP = request.remote_addr
     web3 = Web3(HTTPProvider("https://ropsten.infura.io/v3/6461e805d3694c6eaecd368952cdb4c5"))
-    web3.eth.enable_unaudited_features()
-
     nonce = web3.eth.getTransactionCount(from_address, "pending")
     result_hash = ""
 

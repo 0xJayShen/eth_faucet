@@ -3,7 +3,6 @@ from flask import Flask
 from gevent.pywsgi import WSGIServer
 from views import faucet, eth_donate_IP, usdt_donate_IP
 from flask_cors import CORS
-
 from flask_apscheduler import APScheduler
 
 app = Flask(__name__)

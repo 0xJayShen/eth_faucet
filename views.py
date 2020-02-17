@@ -131,7 +131,7 @@ def login():
 
         }
         signed = web3.eth.account.signTransaction(transaction, from_privkey)
-        result_hash = web3.toJSON(web3.eth.sendRawTransaction(signed.rawTransaction))
+        result_hash = json.loads(web3.toJSON(web3.eth.sendRawTransaction(signed.rawTransaction)))
     if coin_name == "USDT":
         if IP in usdt_donate_IP:
             return jsonify({"code": 300, "msg": "repeat to receive", "data": {}})

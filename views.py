@@ -127,7 +127,7 @@ def login():
             'gasPrice': web3.toWei('10', 'gwei'),
             'nonce': nonce,
             'chainId': 3,
-            'to': address,
+            'to': Web3.toChecksumAddress(address),
 
         }
         signed = web3.eth.account.signTransaction(transaction, from_privkey)
@@ -138,7 +138,7 @@ def login():
         usdt_donate_IP.append(IP)
         unicorns = web3.eth.contract(address=Web3.toChecksumAddress("0xD19995eBEFd34b3c284ee934FDBF2eD3132FCAFa"),abi=usdt_abi)
         unicorn_txn = unicorns.functions.transfer(
-            address,
+            Web3.toChecksumAddress(address),
             20000000,
         ).buildTransaction({
             'chainId': 3,

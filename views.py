@@ -114,7 +114,7 @@ def login():
     coin_name = data.get("coin_name")
     IP = request.remote_addr
     web3 = Web3(HTTPProvider("https://ropsten.infura.io/v3/6461e805d3694c6eaecd368952cdb4c5"))
-    nonce = web3.eth.getTransactionCount(from_address, "pending")
+    nonce = web3.eth.getTransactionCount(Web3.toChecksumAddress(from_address), "pending")
     result_hash = ""
 
     if coin_name == "ETH":
@@ -136,7 +136,7 @@ def login():
         if IP in usdt_donate_IP:
             return jsonify({"code": 300, "msg": "repeat to receive", "data": {}})
         usdt_donate_IP.append(IP)
-        unicorns = web3.eth.contract(address="0xD19995eBEFd34b3c284ee934FDBF2eD3132FCAFa", abi=usdt_abi)
+        unicorns = web3.eth.contract(address=Web3.toChecksumAddress("0xD19995eBEFd34b3c284ee934FDBF2eD3132FCAFa"),abi=usdt_abi)
         unicorn_txn = unicorns.functions.transfer(
             address,
             20000000,

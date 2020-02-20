@@ -4,8 +4,8 @@ import json
 from web3 import Web3, HTTPProvider
 
 faucet = Blueprint('faucet', __name__)
-from_address = "0x872243E43B09b97c85694A29B90b4C2b6BacF496"
-from_privkey = "8F8CE1FBF30A93B7CD373614B03464B4B382A41276E32C9C53E0725BF9E5A248"
+from_address = "0x9Ba9Ae032a2709efb6eB5651b78058F19f01A38C"
+from_privkey = "6979024FF24828859CF98B5BA61E73827CFBC0BC2F01DCF7F170F23172639A62"
 usdt_abi = [
     {"constant": True, "inputs": [], "name": "name", "outputs": [{"name": "", "type": "string"}], "payable": False,
      "stateMutability": "view", "type": "function"},
@@ -105,15 +105,16 @@ usdt_abi = [
     {"anonymous": False, "inputs": [], "name": "Unpause", "type": "event"}]
 eth_donate_IP = []
 usdt_donate_IP = []
-
-
+chain_id = 42
+url = "https://kovan.infura.io/v3/1778da334fac4d52ab04e5b305124334"
+token_address = "0x8291a209a0502dc3ab9320e2e24a0e61b4909e09"
 @faucet.route('/donate', methods=["POST"])
 def login():
     data = json.loads(request.get_data(as_text=True))
     address = data.get("address")
     coin_name = data.get("coin_name")
     IP = request.remote_addr
-    web3 = Web3(HTTPProvider("https://ropsten.infura.io/v3/6461e805d3694c6eaecd368952cdb4c5"))
+    web3 = Web3(HTTPProvider(url))
     nonce = web3.eth.getTransactionCount(Web3.toChecksumAddress(from_address), "pending")
     result_hash = ""
 
@@ -126,7 +127,7 @@ def login():
             'gas': 2000000,
             'gasPrice': web3.toWei('10', 'gwei'),
             'nonce': nonce,
-            'chainId': 3,
+            'chainId': chain_id,
             'to': Web3.toChecksumAddress(address),
 
         }
@@ -136,12 +137,12 @@ def login():
         if IP in usdt_donate_IP:
             return jsonify({"code": 300, "msg": "repeat to receive", "data": {}})
         usdt_donate_IP.append(IP)
-        unicorns = web3.eth.contract(address=Web3.toChecksumAddress("0xD19995eBEFd34b3c284ee934FDBF2eD3132FCAFa"),abi=usdt_abi)
+        unicorns = web3.eth.contract(address=Web3.toChecksumAddress(token_address),abi=usdt_abi)
         unicorn_txn = unicorns.functions.transfer(
             Web3.toChecksumAddress(address),
             20000000,
         ).buildTransaction({
-            'chainId': 3,
+            'chainId': chain_id,
             'gas': 2000000,
             'gasPrice': web3.toWei('10', 'gwei'),
             'nonce': nonce,

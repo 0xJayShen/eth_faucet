@@ -108,48 +108,54 @@ usdt_donate_IP = []
 chain_id = 42
 url = "https://kovan.infura.io/v3/1778da334fac4d52ab04e5b305124334"
 token_address = "0x8291a209a0502dc3ab9320e2e24a0e61b4909e09"
+
+
 @faucet.route('/donate', methods=["POST"])
 def login():
-    data = json.loads(request.get_data(as_text=True))
-    address = data.get("address")
-    coin_name = data.get("coin_name")
-    IP = request.remote_addr
-    web3 = Web3(HTTPProvider(url))
-    nonce = web3.eth.getTransactionCount(Web3.toChecksumAddress(from_address), "pending")
-    result_hash = ""
+    try:
+        data = json.loads(request.get_data(as_text=True))
+        address = data.get("address")
+        coin_name = data.get("coin_name")
+        IP = request.remote_addr
+        web3 = Web3(HTTPProvider(url))
+        nonce = web3.eth.getTransactionCount(Web3.toChecksumAddress(from_address), "pending")
+        result_hash = ""
 
-    if coin_name == "ETH":
-        if IP in eth_donate_IP:
-            return jsonify({"code": 300, "msg": "repeat to receive", "data": {}})
-        eth_donate_IP.append(IP)
-        transaction = {
-            'value': Web3.toWei(0.01, 'ether'),
-            'gas': 2000000,
-            'gasPrice': web3.toWei('10', 'gwei'),
-            'nonce': nonce,
-            'chainId': chain_id,
-            'to': Web3.toChecksumAddress(address),
+        if coin_name == "ETH":
+            if IP in eth_donate_IP:
+                return jsonify({"code": 300, "msg": "repeat to receive", "data": {}})
+            eth_donate_IP.append(IP)
+            transaction = {
+                'value': Web3.toWei(0.01, 'ether'),
+                'gas': 2000000,
+                'gasPrice': web3.toWei('10', 'gwei'),
+                'nonce': nonce,
+                'chainId': chain_id,
+                'to': Web3.toChecksumAddress(address),
 
-        }
-        signed = web3.eth.account.signTransaction(transaction, from_privkey)
-        result_hash = json.loads(web3.toJSON(web3.eth.sendRawTransaction(signed.rawTransaction)))
-    if coin_name == "USDT":
-        if IP in usdt_donate_IP:
-            return jsonify({"code": 300, "msg": "repeat to receive", "data": {}})
-        usdt_donate_IP.append(IP)
-        unicorns = web3.eth.contract(address=Web3.toChecksumAddress(token_address),abi=usdt_abi)
-        unicorn_txn = unicorns.functions.transfer(
-            Web3.toChecksumAddress(address),
-            20000000,
-        ).buildTransaction({
-            'chainId': chain_id,
-            'gas': 2000000,
-            'gasPrice': web3.toWei('10', 'gwei'),
-            'nonce': nonce,
-        })
-        signed_txn = web3.eth.account.signTransaction(unicorn_txn, from_privkey)
-        result_hash = json.loads(web3.toJSON(web3.eth.sendRawTransaction(signed_txn.rawTransaction)))
+            }
+            signed = web3.eth.account.signTransaction(transaction, from_privkey)
+            result_hash = json.loads(web3.toJSON(web3.eth.sendRawTransaction(signed.rawTransaction)))
+        if coin_name == "USDT":
+            if IP in usdt_donate_IP:
+                return jsonify({"code": 300, "msg": "repeat to receive", "data": {}})
+            usdt_donate_IP.append(IP)
+            unicorns = web3.eth.contract(address=Web3.toChecksumAddress(token_address), abi=usdt_abi)
+            unicorn_txn = unicorns.functions.transfer(
+                Web3.toChecksumAddress(address),
+                20000000,
+            ).buildTransaction({
+                'chainId': chain_id,
+                'gas': 2000000,
+                'gasPrice': web3.toWei('10', 'gwei'),
+                'nonce': nonce,
+            })
+            signed_txn = web3.eth.account.signTransaction(unicorn_txn, from_privkey)
+            result_hash = json.loads(web3.toJSON(web3.eth.sendRawTransaction(signed_txn.rawTransaction)))
 
-    response = jsonify({"code": 200, "msg": "", "data": {"hash": str(result_hash)}})
+        response = jsonify({"code": 200, "msg": "", "data": {"hash": str(result_hash)}})
+    except Exception as a:
+        print(a)
+        response = jsonify({"code": 300, "msg": "repeat to receive", "data": {}})
 
     return response

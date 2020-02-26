@@ -22,7 +22,8 @@ class Config(object):
             'func': '__main__:clean',
             'args': None,
             'trigger': 'interval',
-            'hours': 6,
+            "seconds":5,
+            # 'hours': 6,
             # "minutes":5
         }
     ]

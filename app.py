@@ -22,8 +22,8 @@ class Config(object):
             'func': '__main__:clean',
             'args': None,
             'trigger': 'interval',
-            "seconds":5,
-            # 'hours': 6,
+            # "seconds":5,
+            'hours': 6,
             # "minutes":5
         }
     ]
@@ -33,6 +33,7 @@ app.config.from_object(Config())
 
 
 def clean():
+    print(usdt_donate_IP)
     eth_donate_IP.clear()
     usdt_donate_IP.clear()
 

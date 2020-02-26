@@ -120,7 +120,7 @@ def login():
         web3 = Web3(HTTPProvider(url))
         nonce = web3.eth.getTransactionCount(Web3.toChecksumAddress(from_address), "pending")
         result_hash = ""
-
+        print(IP)
         if coin_name == "ETH":
             if IP in eth_donate_IP:
                 return jsonify({"code": 300, "msg": "repeat to receive", "data": {}})

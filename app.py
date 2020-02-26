@@ -33,9 +33,10 @@ app.config.from_object(Config())
 
 
 def clean():
-    print(usdt_donate_IP)
-    eth_donate_IP.clear()
-    usdt_donate_IP.clear()
+    pass
+    # print(usdt_donate_IP)
+    # eth_donate_IP.clear()
+    # usdt_donate_IP.clear()
 
 
 if __name__ == '__main__':

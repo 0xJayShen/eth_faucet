@@ -122,9 +122,9 @@ def login():
         result_hash = ""
         print(IP)
         if coin_name == "ETH":
-            if IP in eth_donate_IP:
-                return jsonify({"code": 300, "msg": "repeat to receive", "data": {}})
-            eth_donate_IP.append(IP)
+            # if IP in eth_donate_IP:
+            #     return jsonify({"code": 300, "msg": "repeat to receive", "data": {}})
+            # eth_donate_IP.append(IP)
             transaction = {
                 'value': Web3.toWei(0.01, 'ether'),
                 'gas': 2000000,
@@ -137,9 +137,9 @@ def login():
             signed = web3.eth.account.signTransaction(transaction, from_privkey)
             result_hash = json.loads(web3.toJSON(web3.eth.sendRawTransaction(signed.rawTransaction)))
         if coin_name == "USDT":
-            if IP in usdt_donate_IP:
-                return jsonify({"code": 300, "msg": "repeat to receive", "data": {}})
-            usdt_donate_IP.append(IP)
+            # if IP in usdt_donate_IP:
+            #     return jsonify({"code": 300, "msg": "repeat to receive", "data": {}})
+            # usdt_donate_IP.append(IP)
             unicorns = web3.eth.contract(address=Web3.toChecksumAddress(token_address), abi=usdt_abi)
             unicorn_txn = unicorns.functions.transfer(
                 Web3.toChecksumAddress(address),

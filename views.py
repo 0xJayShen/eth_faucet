@@ -2,10 +2,23 @@
 from flask import Blueprint, jsonify, request
 import json
 from web3 import Web3, HTTPProvider
+import logging
+import traceback
+
+encoding = "UTF-8"
+# handler = logging.StreamHandler()
+handler = logging.FileHandler(filename='mylog.log', encoding='utf-8', )
+fmt = logging.Formatter(fmt='%(asctime)s -- %(message)s -- %(filename)s -- %(lineno)d', datefmt='"%Y/%m/%d/ %H:%M:%S "')
+handler.setFormatter(fmt)
+log = logging.getLogger('log')
+log.addHandler(handler)
+log.setLevel(logging.DEBUG)
 
 faucet = Blueprint('faucet', __name__)
-from_address = "0x9Ba9Ae032a2709efb6eB5651b78058F19f01A38C"
-from_privkey = "6979024FF24828859CF98B5BA61E73827CFBC0BC2F01DCF7F170F23172639A62"
+eth_from_address = "0xb2Dc181F5580AF44570fC004e16f2E3E8222C2a0"
+eth_from_privkey = "DDAB8C68D59D33E4943C43927679E7FB049C454B58FD2BF9C69779E5664D9C6A"
+usdt_from_address = "0xDc4D5d5770fce6D8f4e0696E5EC44f025891C4e0"
+usdt_from_privkey = "F378C71E699F2478711958A75925D0F916E4B010C9D66F81E4BBB44D6A82D034"
 usdt_abi = [
     {"constant": True, "inputs": [], "name": "name", "outputs": [{"name": "", "type": "string"}], "payable": False,
      "stateMutability": "view", "type": "function"},
@@ -117,9 +130,10 @@ def login():
         address = data.get("address")
         coin_name = data.get("coin_name")
         web3 = Web3(HTTPProvider(url))
-        nonce = web3.eth.getTransactionCount(Web3.toChecksumAddress(from_address), "pending")
         result_hash = ""
         if coin_name == "ETH":
+            nonce = web3.eth.getTransactionCount(Web3.toChecksumAddress(eth_from_address), "pending")
+
             if address in eth_donate_address:
                 return jsonify({"code": 300, "msg": "repeat to receive", "data": {}})
             eth_donate_address.append(address)
@@ -132,9 +146,11 @@ def login():
                 'to': Web3.toChecksumAddress(address),
 
             }
-            signed = web3.eth.account.signTransaction(transaction, from_privkey)
+            signed = web3.eth.account.signTransaction(transaction, eth_from_privkey)
             result_hash = json.loads(web3.toJSON(web3.eth.sendRawTransaction(signed.rawTransaction)))
         if coin_name == "USDT":
+            nonce = web3.eth.getTransactionCount(Web3.toChecksumAddress(usdt_from_address), "pending")
+
             if address in usdt_donate_address:
                 return jsonify({"code": 300, "msg": "repeat to receive", "data": {}})
             usdt_donate_address.append(address)
@@ -148,12 +164,13 @@ def login():
                 'gasPrice': web3.toWei('10', 'gwei'),
                 'nonce': nonce,
             })
-            signed_txn = web3.eth.account.signTransaction(unicorn_txn, from_privkey)
+            signed_txn = web3.eth.account.signTransaction(unicorn_txn, usdt_from_privkey)
             result_hash = json.loads(web3.toJSON(web3.eth.sendRawTransaction(signed_txn.rawTransaction)))
 
         response = jsonify({"code": 200, "msg": "", "data": {"hash": str(result_hash)}})
-    except Exception as a:
-        print(a)
+    except Exception as e:
+        error_traceback = traceback.format_exc()
+        log.error(error_traceback)
         response = jsonify({"code": 300, "msg": "repeat to receive", "data": {}})
 
     return response

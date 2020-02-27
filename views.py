@@ -103,8 +103,8 @@ usdt_abi = [
         {"indexed": False, "name": "value", "type": "uint256"}], "name": "Transfer", "type": "event"},
     {"anonymous": False, "inputs": [], "name": "Pause", "type": "event"},
     {"anonymous": False, "inputs": [], "name": "Unpause", "type": "event"}]
-eth_donate_IP = []
-usdt_donate_IP = []
+eth_donate_address = []
+usdt_donate_address = []
 chain_id = 42
 url = "https://kovan.infura.io/v3/1778da334fac4d52ab04e5b305124334"
 token_address = "0x8291a209a0502dc3ab9320e2e24a0e61b4909e09"
@@ -116,15 +116,13 @@ def login():
         data = json.loads(request.get_data(as_text=True))
         address = data.get("address")
         coin_name = data.get("coin_name")
-        IP = request.remote_addr
         web3 = Web3(HTTPProvider(url))
         nonce = web3.eth.getTransactionCount(Web3.toChecksumAddress(from_address), "pending")
         result_hash = ""
-        print(IP)
         if coin_name == "ETH":
-            # if IP in eth_donate_IP:
-            #     return jsonify({"code": 300, "msg": "repeat to receive", "data": {}})
-            # eth_donate_IP.append(IP)
+            if address in eth_donate_address:
+                return jsonify({"code": 300, "msg": "repeat to receive", "data": {}})
+            eth_donate_address.append(address)
             transaction = {
                 'value': Web3.toWei(0.01, 'ether'),
                 'gas': 2000000,
@@ -137,9 +135,9 @@ def login():
             signed = web3.eth.account.signTransaction(transaction, from_privkey)
             result_hash = json.loads(web3.toJSON(web3.eth.sendRawTransaction(signed.rawTransaction)))
         if coin_name == "USDT":
-            # if IP in usdt_donate_IP:
-            #     return jsonify({"code": 300, "msg": "repeat to receive", "data": {}})
-            # usdt_donate_IP.append(IP)
+            if address in usdt_donate_address:
+                return jsonify({"code": 300, "msg": "repeat to receive", "data": {}})
+            usdt_donate_address.append(address)
             unicorns = web3.eth.contract(address=Web3.toChecksumAddress(token_address), abi=usdt_abi)
             unicorn_txn = unicorns.functions.transfer(
                 Web3.toChecksumAddress(address),

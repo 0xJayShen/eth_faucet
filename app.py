@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 from flask import Flask
 from gevent.pywsgi import WSGIServer
-from views import faucet, eth_donate_IP, usdt_donate_IP
+from views import faucet, eth_donate_address, usdt_donate_address
 from flask_cors import CORS
 from flask_apscheduler import APScheduler
 
@@ -22,7 +22,7 @@ class Config(object):
             'func': '__main__:clean',
             'args': None,
             'trigger': 'interval',
-            # "seconds":5,
+            # "seconds":20,
             'hours': 6,
             # "minutes":5
         }
@@ -33,10 +33,8 @@ app.config.from_object(Config())
 
 
 def clean():
-    pass
-    # print(usdt_donate_IP)
-    # eth_donate_IP.clear()
-    # usdt_donate_IP.clear()
+    eth_donate_address.clear()
+    usdt_donate_address.clear()
 
 
 if __name__ == '__main__':
